@@ -1,5 +1,6 @@
 GOOSE ?= .toolchain/goose/build/goose
 CC ?= gcc
+.NOTPARALLEL:
 .PHONY: setup format check build debug test sanitize
 setup:
 	./scripts/setup-goose.sh

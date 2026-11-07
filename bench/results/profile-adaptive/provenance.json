@@ -1,0 +1,9 @@
+{
+  "source": "4d1c5c7a57e0540aaf2b94152bd39afd511bd063",
+  "fixture": "1000 files 0000.txt..0999.txt, each needle next LF; regex absent; glob **/*.txt",
+  "build": "goose build search.goose --standalone --cc gcc -O2 --stack-reserve 16M -o .build/search-profile-adaptive",
+  "profile": "valgrind --tool=callgrind --callgrind-out-file=.build/callgrind.adaptive .build/search-profile-adaptive --glob **/*.txt -- absent ABSROOT",
+  "binary_sha256": "a021cad9a59f597efb6ab9d72daaa5bb62ba508822c2801d33a0a657d9c95285",
+  "valgrind": "valgrind-3.25.1",
+  "note": "Instrumented instruction counts, not native CPU time; profiler-only 16MiB stack reservation; production settings unchanged."
+}

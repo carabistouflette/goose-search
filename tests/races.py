@@ -16,9 +16,8 @@ for kind in ['gone','fifo','link']:
         (root/'a').write_bytes(b'hit')
         (root/'b').write_bytes(b'hit')
         result=subprocess.run([tool,'--','hit',str(root)],env={**os.environ,'SEARCH_RACE':kind},capture_output=True,timeout=5)
-        assert result.returncode==2,(kind,result.returncode,result.stderr)
-        assert result.stdout==b'',(kind,result.stdout)
-        assert b'cannot read selected regular file: b' in result.stderr,(kind,result.stderr)
+        if result.returncode!=2 or result.stdout!=b'' or b'cannot read selected regular file: b' not in result.stderr:
+            raise RuntimeError((kind,result.returncode,result.stdout,result.stderr))
 print('Selected-file disappearance, FIFO replacement and symlink replacement rejected without output')
 
 for kind in ['grow','grow-binary','grow-large']:
