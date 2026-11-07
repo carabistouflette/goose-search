@@ -143,7 +143,8 @@ class Search(unittest.TestCase):
         self.assertIn(b'regex search failed',limited.stderr)
         for pattern in ['(', '(*UTF)x', 'x'*16385]:
             self.assertEqual(self.run_search(pattern,expected=2).stdout,b'')
-        for options in [('--glob','['),('--binary','bad'),('--glob','**','--glob','**')]:
+        self.assertEqual(self.run_search('hit','--glob','a'*1024,expected=1).stdout,b'')
+        for options in [('--glob','a'*1025),('--glob','['),('--binary','bad'),('--glob','**','--glob','**')]:
             self.assertEqual(self.run_search('hit',*options,expected=2).stdout,b'')
         for command in [[TOOL],[TOOL,'hit',str(self.root)],[TOOL,'--','hit','relative']]:
             self.assertEqual(subprocess.run(command,capture_output=True,timeout=5).returncode,2)

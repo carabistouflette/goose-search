@@ -34,7 +34,7 @@ sanitize:
 .PHONY: native test-races sanitize-races
 native:
 	mkdir -p .build
-	$(CC) -std=c11 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer tests/native_output.c native/output.c -Wl,--wrap=write -o .build/native-output
+	$(CC) -std=c11 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie -no-pie tests/native_output.c native/output.c -Wl,--wrap=write -o .build/native-output
 	ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 .build/native-output
 test-races:
 	mkdir -p .build
@@ -44,3 +44,10 @@ sanitize-races:
 	mkdir -p .build
 	"$(GOOSE)" build search.goose --standalone --debug --no-bce --cc "$$(python3 scripts/race-compiler.py --cc "$(CC)" --sanitize)" -o .build/goose-search-races-sanitize
 	ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 python3 tests/races.py --tool .build/goose-search-races-sanitize
+
+.PHONY: analyze bench-smoke
+analyze:
+	mkdir -p .build
+	clang --analyze -std=c11 -Wall -Wextra -Werror native/output.c -o .build/output.plist
+bench-smoke:
+	python3 bench/measure.py --goose "$(abspath $(GOOSE))" --cc "$(CC)" --runs 1 --output .build/bench-smoke/report.json

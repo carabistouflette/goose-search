@@ -18,7 +18,7 @@ fn execute(argv: u8[:][:]) -> i32 {
         let option = argv[at];
         if at + 1 >= argv.len { diagnostic("option requires a value"); return 2; }
         let value = argv[at + 1];
-        if option == "--glob" && (seen & 1) == 0 && value.len > 0 && value.len <= 4096 { inclusion = str(value); seen |= 1; }
+        if option == "--glob" && (seen & 1) == 0 && value.len > 0 && value.len <= glob::MAX_PATTERN_BYTES { inclusion = str(value); seen |= 1; }
         else if option == "--binary" && (seen & 2) == 0 && (value == "skip" || value == "search") { binary = value == "search"; seen |= 2; }
         else { diagnostic("invalid or duplicate option"); return 2; }
         at += 2;

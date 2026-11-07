@@ -14,7 +14,7 @@ promised stable between them. Hard links, mounts and concurrent changes remain
 possible. Replaced nonregular/symlink selected files cause errors. The underlying
 filesystem may invoke device callbacks before its regular-file check.
 
-Fixed limits: 1000 selected files, 10000 visited entries, depth32, 1MiB retained
+Fixed limits: 16384 regex bytes, 1024 glob bytes, 1000 selected files, 10000 visited entries, depth32, 1MiB retained
 path bytes, 1MiB/file, 64KiB/line excluding LF, 64MiB total accepted file bytes,
 1million regex calls, 10000 matching lines, 8MiB encoded output. Filesystem reads
 can probe one extra byte to detect overflow. Metadata sizes the initial read;
