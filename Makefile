@@ -14,7 +14,7 @@ check:
 	python3 vendor/goose-fs/scripts/native-manifest.py --check
 	"$(GOOSE)" format --check search.goose src
 	"$(GOOSE)" check search.goose
-	python3 -m py_compile scripts/*.py tests/*.py
+	python3 -m py_compile scripts/*.py tests/*.py bench/*.py
 	git diff --check
 build:
 	mkdir -p .build
