@@ -5,7 +5,7 @@ regex, filesystem and glob sources. It does not change their interfaces.
 
 ## Executable checks
 
-- Twelve public CLI methods run in optimized and debug builds with GCC and Clang.
+- The initial alpha.1 checkpoint ran twelve public CLI methods in optimized and debug builds with GCC and Clang.
   They cover exact byte output, BFS ordering, empty matches/files, trailing LF,
   CRLF, binary and non-UTF-8 data, terminal escaping, hidden/excluded entries,
   symlinks/FIFOs, pattern/options errors, resource boundaries and stdout failures.
@@ -55,3 +55,13 @@ See bench/README.md for recipes, exact fixture definitions and limitations.
 Finite tests do not establish behavior for all filesystems or concurrent schedules,
 all regex syntax, every backend version or unsupported platforms. Work limits and
 I/O bounds are not wall-clock deadlines. Collection is not a filesystem snapshot.
+
+## Dogfooding follow-up
+
+The diagnostics follow-up adds syntax-only root preflight, distinct invalid-glob/
+collection-limit messages and omission of zero errno. It changes neither search
+results nor bounds. Fifteen public CLI methods and the native/race suites pass
+with GCC and Clang, including ASan/UBSan. Independent findings, safety and quality
+reviews passed. See docs/DOGFOODING.md for the live-worktree scope, private-output
+policy, controlled reproducers and unchanged behavior. No historical timing data
+is relabeled as a measurement of this later source.

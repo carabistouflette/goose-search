@@ -73,6 +73,38 @@ one result. UTF/UCP activation is disabled by goose-regex; PCRE2 byte syntax and
 resource semantics apply. There is no Unicode character-column or multiline-file
 matching promise.
 
+## Practical searches and troubleshooting
+
+Choose the extensions and source root that actually exist in the project:
+
+```sh
+.build/goose-search --glob '**/*.goose' -- 'fn (compile|binary)\(' /absolute/project
+.build/goose-search --glob '**/*.mjs' -- 'fetch\(' /absolute/web-project/src
+.build/goose-search --glob '*.yml' -- 'uses:' /absolute/project/.github/workflows
+```
+
+Use a strict absolute root without a trailing slash (except `/`) or dot components.
+If the shell's working-directory path contains symlinks, use the physical directory
+reported by `pwd -P`; the CLI does not normalize or follow those components. Root
+syntax validation does not prove existence, readability or the no-follow policy.
+Those are checked by filesystem operations.
+
+Malformed globs, collection limits and filesystem errors have distinct diagnostics.
+OS failures retain a nonzero `errno`; logical failures do not print `errno=0`.
+For collection entry/depth/work limits, choose a smaller root. A narrower `--glob`
+can reduce selected files, but does not prune otherwise visited directories or
+remove their listing/traversal limits. For long generated lines, select source
+extensions or search a source directory; the tool does not silently truncate them.
+
+Glob syntax is described by the [pinned goose-glob documentation](https://github.com/carabistouflette/goose-glob/blob/5543007cc02e324c0fce51919291b40ffb2af922/README.md#pattern-rules).
+`*`, `?`, character classes and whole-component `**` are supported. Braces are
+literal: quoted `**/*.{goose,py}` does not mean two extensions. It matches names
+containing that literal suffix. Exit1 can mean no selected files or no matching
+lines; there is no automatic extension detection.
+
+The [dogfooding record](docs/DOGFOODING.md) explains the observed usability changes
+and the intentional limits that were retained.
+
 ## Bounds
 
 | Resource | Fixed ceiling |
