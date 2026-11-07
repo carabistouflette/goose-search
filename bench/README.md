@@ -35,4 +35,4 @@ annotation and recipe/source/binary identity. The fixture is 1,000 files named
 Profiles use an optimized executable with a 16MiB stack reservation solely to fit
 Valgrind address-space requirements. Production/timing builds keep default stacks.
 These are simulated instruction counts, not native CPU time or throughput. Source
-snapshot identities distinguish the profiling checkpoints from later docs changes.
+snapshot identities distinguish the profiling checkpoints from later source/documentation changes.

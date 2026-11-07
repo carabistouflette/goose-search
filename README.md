@@ -54,9 +54,9 @@ handling in this version.
 
 ## Selection and byte semantics
 
-Hidden paths are skipped. Directories named `vendor`, `target` or `node_modules`
-are pruned at any depth; choose such a directory as the root to search it
-explicitly. Results follow breadth-first directory order, with unsigned-byte
+Hidden paths are skipped. Entries named `vendor`, `target` or `node_modules`
+are excluded at any depth, and excluded directories are pruned. Choose such a
+directory as the root to search its contents explicitly. Results follow breadth-first directory order, with unsigned-byte
 sorting inside each directory; they are not globally sorted.
 
 NUL anywhere in a bounded file classifies it as binary. Default `--binary skip`

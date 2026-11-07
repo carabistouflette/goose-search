@@ -6,7 +6,8 @@ file with no-follow regular-file reads; return the first match on each line.
 
 Invocation: `goose-search [--glob PATTERN] [--binary skip|search] -- REGEX ABSROOT`.
 No stdin, shell, configuration file, color, iterator or replacement. Hidden paths
-are skipped. Prune vendor, target and node_modules at any depth; choose one of
+are skipped. Exclude entries named vendor, target and node_modules at any depth
+and prune excluded directories; choose one of
 those directories as the root to search it explicitly. Collection is sorted BFS,
 not global path sort. No gitignore handling or snapshot/sandbox guarantee.
 Collection and later reads are separate observations; root identity is not

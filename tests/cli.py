@@ -71,7 +71,7 @@ class Search(unittest.TestCase):
         self.assertNotIn(b'\x1b', result.stdout)
 
     def test_hidden_exclusions_and_path_glob(self):
-        for name in ['.hidden', 'vendor/a', 'x/vendor/a', 'node_modules/a', 'target/a', 'src/a.goose', 'src/b.txt']:
+        for name in ['.hidden', 'vendor/a', 'x/vendor/a', 'node_modules/a', 'target/a', 'plain/vendor', 'src/a.goose', 'src/b.txt']:
             self.put(name, b'hit')
         result = self.run_search('hit', '--glob', '**/*.goose', expected=0)
         self.assertEqual(result.stdout, b'src/a.goose:1:1:hit\n')
