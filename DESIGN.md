@@ -17,7 +17,9 @@ filesystem may invoke device callbacks before its regular-file check.
 Fixed limits: 1000 selected files, 10000 visited entries, depth32, 1MiB retained
 path bytes, 1MiB/file, 64KiB/line excluding LF, 64MiB total accepted file bytes,
 1million regex calls, 10000 matching lines, 8MiB encoded output. Filesystem reads
-can probe one extra byte to detect overflow. PCRE2 work limit100000 per candidate
+can probe one extra byte to detect overflow. Metadata sizes the initial read;
+one bounded retry up to the remaining ceiling handles concurrent growth. Failed
+attempts/probes do not count as accepted content bytes. PCRE2 work limit100000 per candidate
 start and depth1000 are not deadlines. OS I/O has no deadline either.
 
 NUL anywhere in a bounded file means binary. Default skip occurs before line

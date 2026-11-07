@@ -44,6 +44,20 @@ fn line(pattern: regex::Pattern, bytes: const u8[:], name: const u8[:], escaped_
     out.push('\n'); counts.matches++;
     return Status { .. };
 }
+// Size a bounded read from metadata, then retry once if the file grew. Neither
+// observation is a snapshot; the no-follow read still validates the opened file.
+fn read(root: fs::Root, path: const u8[:], ceiling: i64, bytes: u8[>..]&) -> fs::Status {
+    var metadata = fs::Metadata { .. };
+    let inspected = fs::metadata_at(root, path, metadata);
+    if inspected.error != fs::Error.None { bytes.clear(); return inspected; }
+    if metadata.kind != fs::Kind.File { bytes.clear(); return fs::Status { error: fs::Error.NotRegular }; }
+    let requested = if metadata.size < (ceiling as u64) { metadata.size as! i64 } else { ceiling };
+    let result = fs::read_file_at(root, path, requested, bytes);
+    if result.error == fs::Error.LimitExceeded && requested < ceiling {
+        return fs::read_file_at(root, path, ceiling, bytes);
+    }
+    return result;
+}
 fn scan(pattern: regex::Pattern, root: fs::Root, paths: const u8[][:], binary: bool,
         counts: Counts&, out: u8[>..]&) -> Status {
     var bytes:   u8[>..]  = [];
@@ -51,7 +65,7 @@ fn scan(pattern: regex::Pattern, root: fs::Root, paths: const u8[][:], binary: b
     for path in paths {
         let remaining = TOTAL_BYTES - counts.bytes;
         let limit = min(FILE_BYTES, remaining);
-        let read = fs::read_file_at(root, path, limit, bytes);
+        let read = read(root, path, limit, bytes);
         if read.error != fs::Error.None {
             if read.error == fs::Error.LimitExceeded { return failure(if remaining < FILE_BYTES { Error.TotalLimit } else { Error.FileLimit }, path); }
             return failure(Error.Read, path, read.os_error);

@@ -70,7 +70,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='goose-search measurement ') as temporary:
         work=Path(temporary)
         if args.baseline_ref:
-            baseline=capture('git','-C',str(ROOT),'rev-parse','--verify',args.baseline_ref+'^{commit}')
+            baseline=capture('git','-C',str(ROOT),'rev-parse','--verify','--end-of-options',args.baseline_ref+'^{commit}')
             source=work/'baseline-source';source.mkdir()
             archive=subprocess.check_output(['git','-C',str(ROOT),'archive',baseline])
             subprocess.run(['tar','-x','-C',str(source)],input=archive,check=True)

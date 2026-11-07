@@ -20,3 +20,16 @@ for kind in ['gone','fifo','link']:
         assert result.stdout==b'',(kind,result.stdout)
         assert b'cannot read selected regular file: b' in result.stderr,(kind,result.stderr)
 print('Selected-file disappearance, FIFO replacement and symlink replacement rejected without output')
+
+for kind in ['grow','grow-binary','grow-large']:
+    for initial in [b'',b'x']:
+        with tempfile.TemporaryDirectory(prefix='search growth ') as temporary:
+            root=Path(temporary)
+            (root/'a').write_bytes(b'hit')
+            (root/'b').write_bytes(initial)
+            result=subprocess.run([tool,'--','hit',str(root)],env={**os.environ,'SEARCH_RACE':kind},capture_output=True,timeout=5)
+            wanted=b'a:1:1:hit\n'+(b'b:1:1:hit longer\n' if kind=='grow' else b'')
+            if kind=='grow-large':
+                if result.returncode!=2 or result.stdout!=b'': raise RuntimeError((kind,result))
+            elif result.returncode!=0 or result.stdout!=wanted: raise RuntimeError((kind,result))
+print('Bounded growth retry, late-binary classification and oversized growth regressions passed')
