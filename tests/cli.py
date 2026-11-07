@@ -133,7 +133,11 @@ class Search(unittest.TestCase):
         self.assertIn(b'call limit',result.stderr)
         (self.root/'a').unlink()
         for i in range(1001): self.put(str(i),b'')
-        self.assertEqual(self.run_search(expected=2).stdout,b'')
+        result=self.run_search(expected=2)
+        self.assertEqual(result.stdout,b'')
+        self.assertIn(b'file collection limit exceeded',result.stderr)
+        self.assertIn(b'smaller root',result.stderr)
+        self.assertNotIn(b'errno=0',result.stderr)
 
     def test_regex_failures_and_invalid_arguments(self):
         self.put('a',b'hit')
@@ -148,6 +152,47 @@ class Search(unittest.TestCase):
             self.assertEqual(self.run_search('hit',*options,expected=2).stdout,b'')
         for command in [[TOOL],[TOOL,'hit',str(self.root)],[TOOL,'--','hit','relative']]:
             self.assertEqual(subprocess.run(command,capture_output=True,timeout=5).returncode,2)
+
+    def test_actionable_root_glob_and_filesystem_errors(self):
+        for root in ['.', '', str(self.root)+'/', str(self.root)+'/./', str(self.root)+'//child']:
+            with self.subTest(root=root):
+                result=subprocess.run([TOOL,'--','hit',root],capture_output=True,timeout=5)
+                self.assertEqual(result.returncode,2)
+                self.assertEqual(result.stdout,b'')
+                self.assertIn(b'root must be a strict absolute path',result.stderr)
+                self.assertNotIn(b'errno=0',result.stderr)
+        result=self.run_search('hit','--glob','[',expected=2)
+        self.assertIn(b'invalid --glob pattern',result.stderr)
+        self.assertNotIn(b'errno=',result.stderr)
+        # '/' is valid syntax. The malformed glob must fail before traversal.
+        result=subprocess.run([TOOL,'--glob','[','--','hit','/'],capture_output=True,timeout=5)
+        self.assertEqual(result.returncode,2)
+        self.assertIn(b'invalid --glob pattern',result.stderr)
+        self.assertNotIn(b'root must',result.stderr)
+        result=subprocess.run([TOOL,'--','hit',str(self.root/'missing')],capture_output=True,timeout=5)
+        self.assertEqual(result.returncode,2)
+        self.assertEqual(result.stdout,b'')
+        self.assertRegex(result.stderr,rb'errno=[1-9][0-9]*')
+
+    def test_braces_are_literal_in_path_globs(self):
+        self.put('a.goose',b'hit')
+        self.assertEqual(self.run_search('hit','--glob','**/*.{goose,py}',expected=1).stdout,b'')
+        self.put('literal.{goose,py}',b'hit')
+        self.assertEqual(self.run_search('hit','--glob','**/*.{goose,py}',expected=0).stdout,
+                         b'literal.{goose,py}:1:1:hit\n')
+
+    def test_narrowing_generated_output_preserves_line_limit(self):
+        self.put('src/app.mjs',b'const value = "Goose";\n')
+        self.put('_site/index.html',b'Goose'+b'x'*65532)
+        result=self.run_search('Goose',expected=2)
+        self.assertEqual(result.stdout,b'')
+        self.assertIn(b'line byte limit exceeded: _site/index.html',result.stderr)
+        self.assertNotIn(b'errno=0',result.stderr)
+        result=self.run_search('Goose','--glob','**/*.mjs',expected=0)
+        self.assertIn(b'src/app.mjs:1:',result.stdout)
+        result=subprocess.run([TOOL,'--','Goose',str(self.root/'src')],capture_output=True,timeout=5)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertTrue(result.stdout.startswith(b'app.mjs:1:'))
 
     def test_stdout_failures(self):
         self.put('a',b'hit')

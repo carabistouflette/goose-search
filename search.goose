@@ -24,17 +24,23 @@ fn execute(argv: u8[:][:]) -> i32 {
         at += 2;
     }
     if at >= argv.len || argv.len - at != 3 { let _ = checked_write(2, usage()); return 2; }
+    let root = argv[at + 2];
+    if !fs::valid_path(root) {
+        diagnostic("root must be a strict absolute path (no . or .., repeated separators, or trailing slash except /)");
+        return 2;
+    }
     let options = regex::Options { input_limit: searching::LINE_BYTES, work_limit: 100000, .. };
     let pattern, compiled = regex::compile(argv[at + 1], options);
     if compiled.error != regex::Error.None { diagnostic(str("invalid regex or compile limit; byte offset=", compiled.error_offset)); return 2; }
     var out: u8[>..] = [];
     var counts = searching::Counts { .. };
-    let status = searching::run(pattern, argv[at + 2], inclusion, binary, counts, out);
+    let status = searching::run(pattern, root, inclusion, binary, counts, out);
     let closed = regex::close(pattern);
     if status.error != searching::Error.None {
         var name: u8[>..] = [];
         let _ = searching::escape(status.path, true, name);
-        diagnostic(str(searching::message(status.error), if name.len > 0 { ": " } else { "" }, name, "; errno=", status.os_error));
+        let os_detail = if status.os_error != 0 { str("; errno=", status.os_error) } else { str("") };
+        diagnostic(str(searching::message(status.error), if name.len > 0 { ": " } else { "" }, name, os_detail));
         return 2;
     }
     if closed != regex::Error.None { diagnostic("regex cleanup failed"); return 2; }

@@ -11,7 +11,7 @@ const TOTAL_BYTES = 67108864;
 const MAX_CALLS = 1000000;
 const MAX_MATCHES = 10000;
 const OUTPUT_BYTES = 8388608;
-enum Error { None, Collection, Open, Read, FileLimit, TotalLimit, LineLimit, CallLimit, MatchLimit, OutputLimit, Regex, Close }
+enum Error { None, Collection, InvalidGlob, CollectionLimit, Open, Read, FileLimit, TotalLimit, LineLimit, CallLimit, MatchLimit, OutputLimit, Regex, Close }
 struct Status { error: Error = Error.None, os_error: i64 = 0, path: u8[>..] }
 struct Counts { bytes: i64 = 0, calls: i64 = 0, matches: i64 = 0 }
 fn failure(error: Error, path: const u8[:] = "", os_error: i64 = 0) -> Status {
@@ -97,7 +97,12 @@ fn run(pattern: regex::Pattern, directory: const u8[:], inclusion: const u8[:], 
     var paths: u8[][>..] = [];
     let excludes: const u8[:][] = ["**/vendor", "**/target", "**/node_modules"];
     let collected = glob_walk::collect(directory, inclusion, excludes, glob_walk::Options { .. }, paths);
-    if collected.error != glob::Error.None { return failure(Error.Collection, "", collected.os_error); }
+    if collected.error != glob::Error.None {
+        let error = if collected.error == glob::Error.InvalidPattern { Error.InvalidGlob }
+                    else if collected.error == glob::Error.LimitExceeded { Error.CollectionLimit }
+                    else { Error.Collection };
+        return failure(error, "", collected.os_error);
+    }
     let context, created = fs::create_context();
     if created.error != fs::Error.None { return failure(Error.Open, "", created.os_error); }
     let root, opened = fs::open_root(context, directory);
@@ -111,7 +116,9 @@ fn run(pattern: regex::Pattern, directory: const u8[:], inclusion: const u8[:], 
     return Status { .. };
 }
 fn message(error: Error) -> const u8[:] {
-    if error == Error.Collection { return "file collection failed (glob, path, traversal or collection limit)"; }
+    if error == Error.InvalidGlob { return "invalid --glob pattern; use *, ?, character classes, or whole-component **"; }
+    if error == Error.CollectionLimit { return "file collection limit exceeded; search a smaller root"; }
+    if error == Error.Collection { return "file collection failed; check the root, directory permissions, and concurrent changes"; }
     if error == Error.Open { return "cannot open search root"; }
     if error == Error.Read { return "cannot read selected regular file"; }
     if error == Error.FileLimit { return "file byte limit exceeded"; }
