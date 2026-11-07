@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "libraries": [
+    {
+      "directory": "goose-regex",
+      "repository": "https://github.com/carabistouflette/goose-regex",
+      "revision": "eed3c9d11f28fea30d5f43aa72c77076ab85f1b2",
+      "license": "Apache-2.0",
+      "files": {
+        "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "NOTICE": "168f2b60f339d639bbfe29841c02e4dcb899454b6fc6300e0aa199d64a3589de",
+        "regex.goose": "7d0e9987e4d81638f75a9abb74d53b61b3f442192134883cfb1fb8866fe170b9",
+        "regex.build": "51eb595c859ed802d00e8980b5911cd191f1a3c55349e4663bd99ee471b193ce",
+        "CMakeLists.txt": "07fa13acb5228618f3456e996e15991fd86dbee8623ddb0802542d1a08d427e9",
+        "native/regex.c": "3e58e6a0e1ef58f4653dc1621fd273a5a16b2aded66093cf3595daa328317e40",
+        "native/regex.h": "77deb4243058cdbd4becf44e0eb02c0cf20b487efc8695905186bfe6ac64f82d",
+        "scripts/native-manifest.py": "03fd501e114a739df09dcc2395b8feaa6afba9024497dce0da6fc406ec28b451"
+      }
+    },
+    {
+      "directory": "goose-fs",
+      "repository": "https://github.com/carabistouflette/goose-fs",
+      "revision": "0d84729aed8d72463349cac7d9439d4039ccd6d3",
+      "license": "Apache-2.0",
+      "files": {
+        "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "fs.goose": "8fef184f13af90c2c72af075522c14c56402844d6207b4cfb4c1d670e87f137b",
+        "fs.build": "4ff658811c55b581dc033e06ab1c6b4eeda84c1de9e1fdc78f2cb8cc638e2f65",
+        "native/fs.c": "771639d22cd67ae18f48894a11eccdca3a11c25cb025352aa8151520cffd7e6a",
+        "native/fs.h": "42dbb2dc7b7a07923c6f7058eb2d9f2e1c994d9db68de3b4112a864998f93682",
+        "native/fs_internal.h": "423b852d9b0f9d51971fff0faf7113e8e2d7c50799aa1353782365962b6bd5e2",
+        "native/handles.c": "3e69d2344337744723f32b8d7ef45f532291fc3e6902e27650c83ea098317be0",
+        "scripts/native-manifest.py": "e5243027cf24c880a401596cc39a252a8f675bc472a21360f0463341577335f4"
+      }
+    },
+    {
+      "directory": "goose-glob",
+      "repository": "https://github.com/carabistouflette/goose-glob",
+      "revision": "5543007cc02e324c0fce51919291b40ffb2af922",
+      "license": "Apache-2.0",
+      "files": {
+        "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "glob.goose": "6ee075e290c19781bcdcdba98a66b69756e5a6e4058327d1d3ebc1b6886e5f6e",
+        "walk.goose": "bc5dd9b6beffcf07e058a7d0f2223105c8a7a46519b64bba29717039e0b834bf"
+      }
+    }
+  ]
+}

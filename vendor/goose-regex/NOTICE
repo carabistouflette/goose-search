@@ -1,0 +1,9 @@
+goose-regex
+Copyright 2026 goose-regex contributors
+Licensed under Apache License 2.0; see LICENSE.
+
+This package links the separately installed PCRE2 8-bit library. PCRE2 is not
+vendored or relicensed by this repository. PCRE2 is distributed under its BSD
+licence; see https://github.com/PCRE2Project/pcre2/blob/master/LICENCE and the
+licence distributed with your installed version. Binary distributors must
+preserve applicable PCRE2 notices. No PCRE2 source is copied into this package.
