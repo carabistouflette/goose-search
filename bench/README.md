@@ -1,5 +1,25 @@
 # Reproduce measurements
 
+## Retained source checkpoints
+
+The retained records are historical measurements. Their recorded source hashes
+were compared with checkpoint `c9c07cceeba41575e53cfdeb0095667e3e826551`:
+
+| Record | Measured head | Files whose recorded hashes differ at the checkpoint |
+| --- | --- | --- |
+| [initial.json](results/initial.json) | `19af3f44c5cdd81dd94a88d558341f4e0454c87d` | `search.goose`, `src/searching.goose`, `bench/measure.py` |
+| [read-strategy.json](results/read-strategy.json) | `4d1c5c7a57e0540aaf2b94152bd39afd511bd063` | `search.goose`, `src/searching.goose` |
+
+Later root-path validation and collection-error handling changes are inside the
+whole-process timed invocation. These samples do not measure the checkpoint's
+executable or later `main` revisions. They remain observations of the exact
+revisions and workloads recorded in each report; no new timing is inferred from
+ancestry or unchanged portions of the read/match loop. Compare each report's
+`source_sha256` with the intended revision before reusing its results, and
+remeasure when the measured inputs differ.
+
+## Run a new series
+
 ```sh
 python3 bench/measure.py --goose /absolute/path/to/pinned/goose \
   --repos-dir /absolute/path/to/goose-libs --output .build/report.json
